@@ -1,13 +1,54 @@
 package main
 
 import "net/http"
+import "sync"
+import "encoding/json"
+
+type Todo struct {
+	Title string
+	Body  string
+}
+
+var todos []Todo
+var mutex sync.RWMutex
 
 func main() {
-	// Your code here
+	todos = make([]Todo, 0)
+	http.HandleFunc("/", ToDoListHandler)
+	http.ListenAndServe(":3001", http.DefaultServeMux)
 }
 
 func ToDoListHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	// Your code here
+	switch r.Method {
+	case http.MethodGet:
+		mutex.RLock()
+		defer mutex.RUnlock()
+
+		w.Header().Set("content-type", "appication/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(todos)
+		return
+	case http.MethodPost:
+		mutex.Lock()
+		defer mutex.Unlock()
+
+		var todo Todo
+		err := json.NewDecoder(r.Body).Decode(&todo)
+		if err != nil {
+			http.Error(w, "Invalid input", http.StatusBadRequest)
+			return
+		}
+
+		if len(todos) == 0 {
+		}
+		todos = append(todos, todo)
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(todo)
+		return
+	default:
+		return
+	}
 }
