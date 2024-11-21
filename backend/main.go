@@ -5,8 +5,8 @@ import "sync"
 import "encoding/json"
 
 type Todo struct {
-	Title string
-	Body  string
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }
 
 var todos []Todo
@@ -15,7 +15,7 @@ var mutex sync.RWMutex
 func main() {
 	todos = make([]Todo, 0)
 	http.HandleFunc("/", ToDoListHandler)
-	http.ListenAndServe(":3001", http.DefaultServeMux)
+	http.ListenAndServe(":8080", http.DefaultServeMux)
 }
 
 func ToDoListHandler(w http.ResponseWriter, r *http.Request) {
