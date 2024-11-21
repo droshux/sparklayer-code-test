@@ -32,6 +32,7 @@ function App() {
     if (title === undefined || description === undefined) return
 
     // Post the form
+    event.currentTarget.reset()
     const new_todo: TodoType = { title, description }
     await fetch('http://localhost:8080/', {
       method: "POST",

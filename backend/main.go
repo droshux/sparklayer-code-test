@@ -43,8 +43,6 @@ func ToDoListHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if len(todos) == 0 {
-		}
 		todos = append(todos, todo)
 
 		w.WriteHeader(http.StatusOK)
